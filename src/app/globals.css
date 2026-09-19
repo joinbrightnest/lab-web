@@ -1,26 +1,410 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4efe6;
+  --foreground: #1a2e24;
+  --accent: #2c5f45;
+  --honey: #d4a017;
+  --surface: #fffdf8;
+  --line: color-mix(in srgb, var(--accent) 18%, transparent);
+
+  /* ThinkingState ink scale — BrightNest palette, light only */
+  --ink: var(--foreground);
+  --ink-2: color-mix(in srgb, var(--foreground) 70%, transparent);
+  --ink-3: color-mix(in srgb, var(--foreground) 45%, transparent);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent: var(--accent);
+  --color-honey: var(--honey);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --font-sans: var(--font-figtree);
+  --font-display: var(--font-fraunces);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes shimmer-text {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+aside img { background: transparent; border: 0; border-radius: 0; }
+
+/* Lab chrome — sidebar + top strip + stage behind the floating card
+   share #2C5F45. The card itself stays cream (#fffcf7). */
+.lab-sidebar {
+  background: #2c5f45;
+  color: #f4efe6;
+  transition:
+    width 240ms ease,
+    min-width 240ms ease,
+    max-width 240ms ease;
+}
+
+/* Labels clip in place — never slide via transform */
+.lab-sidebar .lab-nav-label,
+.lab-sidebar .lab-brand-wordmark,
+.lab-sidebar .lab-nav-meta {
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 240ms ease;
+}
+
+.lab-sidebar--collapsed .lab-nav-label,
+.lab-sidebar--collapsed .lab-brand-wordmark,
+.lab-sidebar--collapsed .lab-nav-meta {
+  position: absolute;
+  width: 0;
+  height: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Collapsed rail — one vertical center axis, no side padding */
+.lab-sidebar--collapsed {
+  align-items: center;
+}
+
+.lab-sidebar--collapsed .lab-sidebar-brand,
+.lab-sidebar--collapsed .lab-sidebar-nav,
+.lab-sidebar--collapsed .lab-sidebar-footer {
+  box-sizing: border-box;
+  width: 56px;
+  max-width: 56px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lab-sidebar--collapsed .lab-sidebar-nav {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lab-sidebar--collapsed .lab-sidebar-brand-link,
+.lab-sidebar--collapsed .lab-nav-item {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: 56px;
+  max-width: 56px;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  overflow: visible;
+}
+
+.lab-sidebar--collapsed .lab-nav-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+.lab-sidebar--collapsed .lab-nav-icon {
+  position: relative;
+  display: flex;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.lab-sidebar--collapsed .lab-nav-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #d4a017;
+  pointer-events: none;
+}
+
+/* Sidebar footer — user chip + collapse chevron above the bottom edge */
+.lab-sidebar-footer {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+}
+
+.lab-sidebar-footer .lab-sidebar-user {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.lab-collapse-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lab-collapse-btn:hover {
+  background: transparent;
+  opacity: 0.85;
+}
+
+.lab-collapse-btn:focus-visible {
+  outline: 2px solid rgba(212, 160, 23, 0.45);
+  outline-offset: 2px;
+}
+
+/* Collapsed rail: avatar centered, chevron under it, 56px axis */
+.lab-sidebar--collapsed .lab-sidebar-footer {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 56px;
+  max-width: 56px;
+  padding: 10px 0 12px;
+}
+
+.lab-sidebar--collapsed .lab-sidebar-footer .lab-sidebar-user {
+  flex: 0 0 auto;
+  width: 28px;
+}
+
+.lab-top,
+.lab-topstrip {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  padding: 0 12px;
+  background: #2c5f45;
+  color: #f4efe6;
+  overflow: hidden;
+}
+
+.lab-top img,
+.lab-topstrip img,
+.lab-top .lab-top-logo,
+.lab-topstrip .lab-top-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.lab-stage {
+  background: #2c5f45;
+}
+
+.lab-card-slot {
+  /* card top flush under 36px strip; 12px equal gap left & right */
+  padding: 0 12px 0 12px;
+}
+
+.lab-card {
+  background: #fffcf7;
+  border: 0;
+  border-radius: 16px 16px 0 0;
+  overflow: auto;
+}
+
+/* Calendar: one scroll inside the grid, not the Lab card */
+.lab-card:has([data-calendar-page]) {
+  overflow: hidden;
+}
+
+/* Index tables: sticky thead scrolls inside the page, not the Lab card */
+.lab-card:has([data-index-page]) {
+  overflow: hidden;
+}
+
+.lab-utility-row {
+  height: 52px;
+  border-bottom: 1px solid #ede6d8;
+}
+
+.lab-nav-item {
+  height: 36px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #f4efe6;
+}
+
+.lab-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f4efe6;
+}
+
+.lab-nav-item--active {
+  background: #3d7a58;
+  color: #fff;
+}
+
+.lab-nav-item--active:hover {
+  background: #3d7a58;
+  color: #fff;
+}
+
+/* Global search — HubSpot-style Find pill on the green strip */
+.lab-top .lab-global-search,
+.lab-topstrip .lab-global-search {
+  width: 270px;
+  height: 26px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.lab-top .lab-global-search-input,
+.lab-topstrip .lab-global-search-input {
+  box-sizing: border-box;
+  display: block;
+  width: 270px;
+  height: 26px;
+  min-height: 26px;
+  max-height: 26px;
+  margin: 0;
+  padding: 0 32px 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: none;
+  color: #ffffff;
+  caret-color: #ffffff;
+  font-size: 12.5px;
+  line-height: 26px;
+}
+.lab-top .lab-global-search-input::placeholder,
+.lab-topstrip .lab-global-search-input::placeholder {
+  color: #ffffff;
+  opacity: 1;
+  line-height: 26px;
+}
+.lab-top .lab-global-search-input:focus,
+.lab-topstrip .lab-global-search-input:focus {
+  border-color: rgba(255, 255, 255, 0.75);
+  outline: none;
+  box-shadow: none;
+}
+.lab-top .lab-global-search-icon,
+.lab-topstrip .lab-global-search-icon {
+  right: 10px;
+  left: auto;
+  width: 13px;
+  height: 13px;
+  color: #ffffff;
+}
+
+.nou-cursant {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--background);
+}
+
+.nou-cursant > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  user-select: none;
+}
+
+.nou-cursant > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nou-cursant > summary::before {
+  content: "+";
+  margin-right: 8px;
+  color: #6b6458;
+}
+
+.nou-cursant[open] > summary::before {
+  content: "-";
+}
+
+/* BookingSlotCalendar — thin slot scroller */
+.bn-slot-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
+}
+.bn-slot-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.bn-slot-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 999px;
+}
+.bn-slot-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.nou-cursant[open] > summary {
+  border-bottom: 1px solid var(--line);
 }

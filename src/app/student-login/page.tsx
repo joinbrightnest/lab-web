@@ -1,0 +1,94 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { BrightNestMark } from "@/components/BrightNestMark";
+import { studentLogin } from "@/lib/auth-login";
+import { goStudent } from "@/lib/student-paths";
+
+export default function StudentLoginPage() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    setPending(true);
+    try {
+      // POST /lab/api/student-login (Caddy → Flask :5050). Never HTML /login.
+      const result = await studentLogin(username, password);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      // After success → students home only (never /cursanti, /lab, or Lab host).
+      goStudent("home", router);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <main className="flex flex-1 items-center justify-center px-4 py-16">
+      <div className="w-full max-w-md">
+        <div className="flex items-center gap-3">
+          <BrightNestMark />
+          <p
+            className="text-3xl font-semibold tracking-tight text-accent"
+            style={{ fontFamily: "var(--font-fraunces), Georgia, serif" }}
+          >
+            BrightNest
+          </p>
+        </div>
+        <h1 className="mt-2 text-lg text-foreground/80">Student portal</h1>
+
+        <form
+          onSubmit={onSubmit}
+          className="mt-10 flex flex-col gap-5 border-t border-line pt-8"
+        >
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-accent">User</span>
+            <input
+              name="username"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="rounded-md border border-line bg-surface px-3 py-2.5 outline-none ring-honey/40 focus:ring-2"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-medium text-accent">Password</span>
+            <input
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="rounded-md border border-line bg-surface px-3 py-2.5 outline-none ring-honey/40 focus:ring-2"
+            />
+          </label>
+
+          {error ? (
+            <p className="text-sm font-medium text-red-800" role="alert">
+              {error}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={pending}
+            className="mt-2 rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-[#F4EFE6] transition hover:brightness-110 disabled:opacity-60"
+          >
+            {pending ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
