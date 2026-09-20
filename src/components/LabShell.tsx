@@ -14,7 +14,8 @@ import { UserMenuDropdown } from "@/components/UserMenuDropdown";
 import { apiFetch, type Me } from "@/lib/api";
 
 const NAV_LS = "lab-nav-collapsed";
-const SIDEBAR_EXPANDED = 200;
+/** Single Lab rail width — keep in sync with --lab-sidebar-width in globals.css */
+const SIDEBAR_EXPANDED = 216;
 const SIDEBAR_COLLAPSED = 56;
 
 function Icon({ children }: { children: React.ReactNode }) {
@@ -115,8 +116,8 @@ const IcoPlus = (
 
 function navClass(active: boolean, collapsed: boolean) {
   const base = collapsed
-    ? "lab-nav-item flex h-9 items-center justify-center gap-0 overflow-visible"
-    : "lab-nav-item flex h-9 w-full items-center gap-2.5 overflow-hidden px-2.5";
+    ? "lab-nav-item lab-nav-item--rail"
+    : "lab-nav-item";
   return active ? `${base} lab-nav-item--active font-medium` : base;
 }
 
@@ -374,45 +375,48 @@ function LabShellInner({ children }: { children: React.ReactNode }) {
   const width = collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
 
   return (
-    <div className="relative flex h-full min-h-0 flex-1 overflow-hidden">
-      {/* One sidebar — width only; flex sibling so stage never shows a second green strip */}
-      <aside
-        style={{ width, minWidth: width, maxWidth: width }}
-        className={`lab-sidebar flex min-h-0 shrink-0 flex-col overflow-hidden self-stretch${
-          collapsed ? " lab-sidebar--collapsed" : ""
+    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+      {/* Thin strip (36px): brand in sidebar-width slot; search above cream. */}
+      <header
+        className={`lab-top flex shrink-0 items-center${
+          collapsed ? " lab-top--collapsed" : ""
         }`}
       >
-        {/* Brand — first item in the sidebar, no border/line under it. */}
         <div
-          className={`lab-sidebar-brand flex shrink-0 items-center ${
-            collapsed ? "py-4" : "px-3.5 py-4"
-          }`}
+          className="lab-top-brand-slot"
+          style={{ width, minWidth: width, maxWidth: width }}
         >
           <Link
             href="/cursanti"
             title="BrightNest Lab"
-            className={`lab-sidebar-brand-link flex min-w-0 items-center overflow-hidden rounded-md outline-none ring-honey/40 focus-visible:ring-2 ${
-              collapsed ? "h-9 justify-center gap-0" : "w-full gap-2"
-            }`}
+            className="lab-top-brand rounded-md outline-none ring-honey/40 focus-visible:ring-2"
           >
             <BrightNestMark
-              size={28}
-              className="h-7 w-7 shrink-0 object-contain"
+              size={22}
+              className="lab-top-logo object-contain"
             />
             <span
-              className="lab-brand-wordmark text-sm font-semibold text-[#F4EFE6]"
+              className="lab-brand-wordmark"
               style={{ fontFamily: "var(--font-fraunces), serif" }}
             >
               BrightNest Lab
             </span>
           </Link>
         </div>
+        <GlobalSearch isAdmin={isAdmin} />
+      </header>
 
+      <div className="lab-body flex min-h-0 min-w-0 flex-1 overflow-hidden">
+      {/* Sidebar — nav only; brand lives in .lab-top above */}
+      <aside
+        style={{ width, minWidth: width, maxWidth: width }}
+        className={`lab-sidebar${
+          collapsed ? " lab-sidebar--collapsed" : ""
+        }`}
+      >
         {/* Primary nav */}
         <nav
-          className={`lab-sidebar-nav mt-1 flex shrink-0 flex-col gap-0.5 text-sm ${
-            collapsed ? "" : "px-2"
-          }`}
+          className={`lab-sidebar-nav${collapsed ? " lab-sidebar-nav--rail" : ""}`}
         >
           <Link
             href="/cursanti"
@@ -534,22 +538,14 @@ function LabShellInner({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Main stage — green behind the floating cream card. Search stays in
-          the top strip; the card is inset 12px L/R with both top corners
-          rounded (HubSpot-style tuck under the strip). */}
-      <div
-        style={{ minHeight: "100vh" }}
-        className="lab-stage flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
-      >
-        <div className="lab-top flex shrink-0 items-center gap-3">
-          <GlobalSearch isAdmin={isAdmin} />
-        </div>
-
+      {/* Main stage — green behind the floating cream card (no second top bar). */}
+      <div className="lab-stage flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <div className="lab-card-slot flex min-h-0 flex-1 flex-col">
           <div className="lab-card flex min-h-0 flex-1 flex-col">
             {children}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

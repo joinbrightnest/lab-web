@@ -779,7 +779,7 @@ function DosarPageInner() {
 
   const stareCompact =
     cursant && semafor ? (
-      <section className="rounded-lg border border-line bg-surface p-3">
+      <section className="rounded-[12px] border border-line bg-surface p-3">
         <h2 className="mb-2 text-[11.5px] font-bold tracking-[0.08em] text-accent uppercase">
           Current state
         </h2>
@@ -802,7 +802,10 @@ function DosarPageInner() {
     ) : null;
 
   return (
-    <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+    <main
+      data-dosar-page
+      className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground"
+    >
       <div className="lab-utility-row flex shrink-0 items-center px-4 sm:px-5">
         <Link
           href="/cursanti"
@@ -830,7 +833,7 @@ function DosarPageInner() {
           <aside
             className={`flex w-full shrink-0 flex-col gap-3 xl:h-full xl:w-[300px] ${COL_SCROLL}`}
           >
-            <div className="rounded-lg border border-line bg-surface p-4">
+            <div className="rounded-[12px] border border-line bg-surface p-4">
               <div className="flex items-center gap-3">
                 <div
                   className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent text-xl font-semibold text-[#F4EFE6]"
@@ -892,7 +895,7 @@ function DosarPageInner() {
               </div>
             </div>
 
-            <section className="rounded-lg border border-line bg-surface">
+            <section className="rounded-[12px] border border-line bg-surface">
               <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
                 <h2 className="text-[11.5px] font-bold tracking-[0.08em] text-accent uppercase">
                   Initial profile
@@ -930,7 +933,7 @@ function DosarPageInner() {
           {/* MIJLOC — taburi + conținut */}
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden xl:h-full">
             <nav
-              className="z-10 grid shrink-0 grid-cols-3 overflow-hidden rounded-lg border border-line bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]"
+              className="z-10 grid shrink-0 grid-cols-3 gap-1 bg-background"
               aria-label="Dossier sections"
             >
               {(
@@ -946,8 +949,8 @@ function DosarPageInner() {
                   onClick={() => setTab(key)}
                   className={
                     tab === key
-                      ? "bg-surface px-3 py-3 text-sm font-semibold text-foreground"
-                      : "px-3 py-3 text-sm text-foreground/60 hover:text-foreground"
+                      ? "rounded-[12px] border border-line bg-surface px-3 py-3 text-sm font-semibold text-foreground"
+                      : "rounded-[12px] px-3 py-3 text-sm text-foreground/60 hover:bg-surface/60 hover:text-foreground"
                   }
                 >
                   {label}
@@ -958,7 +961,7 @@ function DosarPageInner() {
             <div className={`mt-3 min-h-0 flex-1 ${COL_SCROLL}`}>
               {tab === "prezent" ? (
                 <div className="flex flex-col gap-3 pb-1">
-                  <section className="rounded-lg border border-line bg-surface p-4 sm:p-5">
+                  <section className="rounded-[12px] border border-line bg-surface p-4 sm:p-5">
                     <p className="text-sm text-foreground/80">
                       Ritm: {ritmLabel}
                       <span className="text-foreground/45"> · </span>
@@ -970,7 +973,7 @@ function DosarPageInner() {
                     </p>
                   </section>
 
-                  <section className="rounded-lg border border-line bg-surface p-4 sm:p-5">
+                  <section className="rounded-[12px] border border-line bg-surface p-4 sm:p-5">
                     <div className="mb-3 flex flex-wrap items-center gap-2">
                       <h2 className="text-[11.5px] font-bold tracking-[0.08em] text-accent uppercase">
                         Active mission
@@ -996,7 +999,7 @@ function DosarPageInner() {
               ) : null}
 
               {tab === "activitate" ? (
-                <section className="rounded-xl bg-background p-3 sm:p-4">
+                <section className="rounded-[12px] bg-background p-3 sm:p-4">
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div
                       className="flex flex-wrap gap-1.5"
@@ -1045,7 +1048,7 @@ function DosarPageInner() {
                             <button
                               type="button"
                               onClick={() => openNotaView(r.note)}
-                              className={`w-full rounded-xl bg-surface px-3.5 py-3 text-left transition hover:bg-white ${
+                              className={`w-full rounded-[12px] border border-line bg-surface px-3.5 py-3 text-left transition hover:bg-white ${
                                 r.overdue ? "ring-1 ring-red-700/35" : ""
                               }`}
                             >
@@ -1090,7 +1093,7 @@ function DosarPageInner() {
                           <ul className="flex flex-col gap-2">
                             {events.map((ev) => {
                               const when = formatEventWhen(ev.whenRaw);
-                              const cardClass = `flex w-full items-start gap-3 rounded-xl bg-surface px-3.5 py-3 text-left transition hover:bg-white ${
+                              const cardClass = `flex w-full items-start gap-3 rounded-[12px] border border-line bg-surface px-3.5 py-3 text-left transition hover:bg-white ${
                                 ev.dimmed ? "opacity-70" : ""
                               }`;
                               const inner = (
@@ -1155,7 +1158,7 @@ function DosarPageInner() {
               ) : null}
 
               {tab === "misiune" ? (
-                <section className="rounded-lg border border-line bg-surface p-4 sm:p-5">
+                <section className="rounded-[12px] border border-line bg-surface p-4 sm:p-5">
                   <div className="mb-3 flex flex-wrap items-center gap-2">
                     <h2 className="text-[11.5px] font-bold tracking-[0.08em] text-accent uppercase">
                       Active mission
@@ -1240,7 +1243,7 @@ function DosarPageInner() {
           <aside
             className={`flex w-full shrink-0 flex-col gap-3 xl:h-full xl:w-[280px] ${COL_SCROLL}`}
           >
-            <section className="rounded-lg border border-line bg-surface">
+            <section className="rounded-[12px] border border-line bg-surface">
               <h2 className="border-b border-line px-4 py-2.5 text-[11.5px] font-bold tracking-[0.08em] text-accent uppercase">
                 Training
               </h2>
@@ -1332,7 +1335,10 @@ export default function DosarPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+        <main
+          data-dosar-page
+          className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground"
+        >
           <p className="px-4 py-4 text-sm text-foreground/60 sm:px-5">
             Loading…
           </p>

@@ -824,70 +824,72 @@ export default function CalendarPage() {
           className="flex min-h-0 min-w-0 flex-1 flex-col"
           style={{ background: GRID_BG }}
         >
-          {/* Sticky weekday header — same column widths as grid (48px gutter + days) */}
-          <div
-            className="sticky top-0 z-20 grid shrink-0 border-b"
-            style={{
-              height: DAY_HEADER_H,
-              background: GRID_BG,
-              borderColor: HOUR_LINE,
-              gridTemplateColumns: `${GUTTER_W}px repeat(${colCount}, minmax(0, 1fr))`,
-            }}
-          >
-            <div aria-hidden />
-            {gridDays.map((d) => {
-              const key = ymd(d);
-              const isToday = key === todayYmd;
-              const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-              return (
-                <div
-                  key={key}
-                  className="flex h-full flex-col items-center justify-center"
-                  style={{
-                    background: isToday
-                      ? TODAY_WASH
-                      : isWeekend
-                        ? WEEKEND_WASH
-                        : undefined,
-                  }}
-                >
-                  <span
-                    className="text-[11px] font-medium uppercase leading-none"
-                    style={{
-                      color: HOUR_LABEL,
-                      letterSpacing: "0.06em",
-                    }}
-                  >
-                    {dayHeaderLabel(d)}
-                  </span>
-                  {isToday ? (
-                    <span
-                      className="mt-1 inline-flex items-center justify-center rounded-full text-[15px] font-semibold leading-none text-white"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        background: SESSION_EDGE,
-                      }}
-                    >
-                      {d.getDate()}
-                    </span>
-                  ) : (
-                    <span className="mt-1 text-[15px] font-semibold leading-none text-[#1A1A1A]">
-                      {d.getDate()}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Hour grid — sole scroll container */}
+          {/* Hour grid — sole scroll container; sticky header shares column widths */}
           <div
             ref={gridScrollRef}
             className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
+            style={{ scrollbarGutter: "stable" }}
           >
+            {/* Sticky weekday header — same 7×1fr columns as body */}
             <div
-              className="relative grid"
+              className="sticky top-0 z-20 grid box-border border-b"
+              style={{
+                height: DAY_HEADER_H,
+                background: GRID_BG,
+                borderColor: HOUR_LINE,
+                gridTemplateColumns: `${GUTTER_W}px repeat(${colCount}, minmax(0, 1fr))`,
+              }}
+            >
+              <div className="box-border" aria-hidden />
+              {gridDays.map((d) => {
+                const key = ymd(d);
+                const isToday = key === todayYmd;
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                return (
+                  <div
+                    key={key}
+                    className="box-border flex h-full flex-col items-center justify-center"
+                    style={{
+                      borderLeft: `1px solid ${HOUR_LINE}`,
+                      background: isToday
+                        ? TODAY_WASH
+                        : isWeekend
+                          ? WEEKEND_WASH
+                          : GRID_BG,
+                    }}
+                  >
+                    <span
+                      className="text-[11px] font-medium uppercase leading-none"
+                      style={{
+                        color: HOUR_LABEL,
+                        letterSpacing: "0.06em",
+                      }}
+                    >
+                      {dayHeaderLabel(d)}
+                    </span>
+                    {isToday ? (
+                      <span
+                        className="mt-1 inline-flex items-center justify-center rounded-full text-[15px] font-semibold leading-none text-white"
+                        style={{
+                          width: 24,
+                          height: 24,
+                          background: SESSION_EDGE,
+                        }}
+                      >
+                        {d.getDate()}
+                      </span>
+                    ) : (
+                      <span className="mt-1 text-[15px] font-semibold leading-none text-[#1A1A1A]">
+                        {d.getDate()}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div
+              className="relative grid box-border"
               style={{
                 gridTemplateColumns: `${GUTTER_W}px repeat(${colCount}, minmax(0, 1fr))`,
                 height: gridContentPx,
@@ -896,7 +898,7 @@ export default function CalendarPage() {
               }}
             >
               {/* Time gutter */}
-              <div className="relative" style={{ height: gridContentPx }}>
+              <div className="relative box-border" style={{ height: gridContentPx }}>
                 {Array.from({ length: GRID_HOURS + 1 }, (_, i) => {
                   const top = gridYFromMins(i * 60, hourPx);
                   const hideNearNow =
@@ -934,7 +936,7 @@ export default function CalendarPage() {
                 ) : null}
               </div>
 
-              {/* Day columns */}
+              {/* Day columns — equal 1fr; weekend wash on the cell; border on column edge */}
               {gridDays.map((d) => {
                 const key = ymd(d);
                 const isToday = key === todayYmd;
@@ -986,17 +988,17 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={key}
-                    className="relative cursor-cell"
+                    className="relative box-border cursor-cell"
                     style={{
                       height: gridContentPx,
                       minHeight: gridContentPx,
                       flexShrink: 0,
+                      borderLeft: `1px solid ${HOUR_LINE}`,
                       background: isToday
                         ? TODAY_WASH
                         : isWeekend
                           ? WEEKEND_WASH
                           : GRID_BG,
-                      boxShadow: `inset 1px 0 0 ${HOUR_LINE}`,
                     }}
                     onClick={(e) => {
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -1010,25 +1012,31 @@ export default function CalendarPage() {
                     {Array.from({ length: GRID_HOURS }, (_, i) => (
                       <div key={`h-${i}`}>
                         <div
-                          className="pointer-events-none absolute inset-x-0"
+                          className="pointer-events-none absolute z-0"
                           style={{
                             top: gridYFromMins(i * 60, hourPx),
+                            left: -1,
+                            right: 0,
                             borderTop: `1px solid ${HOUR_LINE}`,
                           }}
                         />
                         <div
-                          className="pointer-events-none absolute inset-x-0"
+                          className="pointer-events-none absolute z-0"
                           style={{
                             top: gridYFromMins(i * 60 + 30, hourPx),
+                            left: -1,
+                            right: 0,
                             borderTop: `1px solid ${HALF_LINE}`,
                           }}
                         />
                       </div>
                     ))}
                     <div
-                      className="pointer-events-none absolute inset-x-0"
+                      className="pointer-events-none absolute z-0"
                       style={{
                         top: gridYFromMins(GRID_HOURS * 60, hourPx),
+                        left: -1,
+                        right: 0,
                         borderTop: `1px solid ${HOUR_LINE}`,
                       }}
                     />

@@ -12,6 +12,10 @@
   --ink: var(--foreground);
   --ink-2: color-mix(in srgb, var(--foreground) 70%, transparent);
   --ink-3: color-mix(in srgb, var(--foreground) 45%, transparent);
+
+  /* Lab rail — single source of truth (keep in sync with SIDEBAR_* in LabShell) */
+  --lab-sidebar-width: 216px;
+  --lab-sidebar-collapsed: 56px;
 }
 
 @theme inline {
@@ -67,7 +71,21 @@ aside img { background: transparent; border: 0; border-radius: 0; }
 
 /* Lab chrome — sidebar + top strip + stage behind the floating card
    share #2C5F45. The card itself stays cream (#fffcf7). */
+.lab-body {
+  min-width: 0;
+}
+
 .lab-sidebar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-self: stretch;
+  min-height: 0;
+  width: var(--lab-sidebar-width);
+  min-width: var(--lab-sidebar-width);
+  max-width: var(--lab-sidebar-width);
+  overflow: hidden;
   background: #2c5f45;
   color: #f4efe6;
   transition:
@@ -76,9 +94,28 @@ aside img { background: transparent; border: 0; border-radius: 0; }
     max-width 240ms ease;
 }
 
+/* Children must never force the rail wider than --lab-sidebar-width */
+.lab-sidebar > *,
+.lab-sidebar .lab-sidebar-nav,
+.lab-sidebar .lab-sidebar-footer,
+.lab-sidebar .lab-nav-item,
+.lab-sidebar .lab-sidebar-user {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-sidebar-nav {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
 /* Labels clip in place — never slide via transform */
 .lab-sidebar .lab-nav-label,
-.lab-sidebar .lab-brand-wordmark,
 .lab-sidebar .lab-nav-meta {
   overflow: hidden;
   white-space: nowrap;
@@ -87,7 +124,6 @@ aside img { background: transparent; border: 0; border-radius: 0; }
 }
 
 .lab-sidebar--collapsed .lab-nav-label,
-.lab-sidebar--collapsed .lab-brand-wordmark,
 .lab-sidebar--collapsed .lab-nav-meta {
   position: absolute;
   width: 0;
@@ -103,14 +139,16 @@ aside img { background: transparent; border: 0; border-radius: 0; }
 /* Collapsed rail — one vertical center axis, no side padding */
 .lab-sidebar--collapsed {
   align-items: center;
+  width: var(--lab-sidebar-collapsed);
+  min-width: var(--lab-sidebar-collapsed);
+  max-width: var(--lab-sidebar-collapsed);
 }
 
-.lab-sidebar--collapsed .lab-sidebar-brand,
 .lab-sidebar--collapsed .lab-sidebar-nav,
 .lab-sidebar--collapsed .lab-sidebar-footer {
   box-sizing: border-box;
-  width: 56px;
-  max-width: 56px;
+  width: var(--lab-sidebar-collapsed);
+  max-width: var(--lab-sidebar-collapsed);
   padding-left: 0;
   padding-right: 0;
   margin-left: 0;
@@ -125,13 +163,13 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   gap: 2px;
 }
 
-.lab-sidebar--collapsed .lab-sidebar-brand-link,
-.lab-sidebar--collapsed .lab-nav-item {
+.lab-sidebar--collapsed .lab-nav-item,
+.lab-sidebar--collapsed .lab-nav-item--rail {
   box-sizing: border-box;
   position: relative;
   display: flex;
-  width: 56px;
-  max-width: 56px;
+  width: var(--lab-sidebar-collapsed);
+  max-width: var(--lab-sidebar-collapsed);
   margin: 0;
   padding: 0;
   justify-content: center;
@@ -141,15 +179,15 @@ aside img { background: transparent; border: 0; border-radius: 0; }
 }
 
 .lab-sidebar--collapsed .lab-nav-item svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .lab-sidebar--collapsed .lab-nav-icon {
   position: relative;
   display: flex;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -174,9 +212,9 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  align-self: stretch;
   gap: 4px;
-  width: 100%;
-  padding: 10px 10px 12px;
+  padding: 10px 8px 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   background: transparent;
 }
@@ -184,6 +222,7 @@ aside img { background: transparent; border: 0; border-radius: 0; }
 .lab-sidebar-footer .lab-sidebar-user {
   min-width: 0;
   flex: 1 1 auto;
+  max-width: calc(100% - 32px);
 }
 
 .lab-collapse-btn {
@@ -222,14 +261,15 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   justify-content: center;
   align-items: center;
   gap: 6px;
-  width: 56px;
-  max-width: 56px;
+  width: var(--lab-sidebar-collapsed);
+  max-width: var(--lab-sidebar-collapsed);
   padding: 10px 0 12px;
 }
 
 .lab-sidebar--collapsed .lab-sidebar-footer .lab-sidebar-user {
   flex: 0 0 auto;
   width: 28px;
+  max-width: 28px;
 }
 
 .lab-top,
@@ -237,33 +277,94 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-start;
+  gap: 0;
   height: 36px;
   min-height: 36px;
   max-height: 36px;
-  padding: 0 12px;
+  padding: 0 12px 0 0;
   background: #2c5f45;
   color: #f4efe6;
   overflow: hidden;
+}
+
+/* Brand sits in the sidebar column; search starts in the main/cream column */
+.lab-top .lab-top-brand-slot {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 10px;
+  overflow: hidden;
+}
+
+.lab-top--collapsed .lab-top-brand-slot {
+  justify-content: center;
+  padding: 0;
+}
+
+.lab-top .lab-top-brand {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 1;
+  align-items: center;
+  gap: 6px;
+  height: 26px; /* same as search input */
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  transform: none;
+}
+
+.lab-top .lab-brand-wordmark {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px; /* text-sm — must not force rail wider */
+  font-weight: 600;
+  line-height: 26px;
+  height: 26px;
+  color: #f4efe6;
+}
+
+.lab-top--collapsed .lab-brand-wordmark {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .lab-top img,
 .lab-topstrip img,
 .lab-top .lab-top-logo,
 .lab-topstrip .lab-top-logo {
-  height: 22px;
-  width: auto;
   display: block;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  max-height: 22px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .lab-stage {
   background: #2c5f45;
+  min-width: 0;
 }
 
 .lab-card-slot {
-  /* card top flush under 36px strip; 12px equal gap left & right */
-  padding: 0 12px 0 12px;
+  /* cream column starts flush after the 216px rail; right inset only */
+  padding: 0 12px 0 0;
 }
 
 .lab-card {
@@ -271,6 +372,25 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   border: 0;
   border-radius: 16px 16px 0 0;
   overflow: auto;
+}
+
+/* Dosar — HubSpot-style contrast: warm grey page, white cards */
+.lab-card:has([data-dosar-page]) {
+  background: #ede8e0;
+}
+
+[data-dosar-page] {
+  --background: #ede8e0;
+  --surface: #fffff9;
+  --line: #e2ddd4;
+  --foreground: #1f2a24;
+  --ink: var(--foreground);
+  --ink-2: color-mix(in srgb, var(--foreground) 70%, transparent);
+  --ink-3: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+[data-dosar-page] .lab-utility-row {
+  border-bottom-color: #e2ddd4;
 }
 
 /* Calendar: one scroll inside the grid, not the Lab card */
@@ -289,10 +409,38 @@ aside img { background: transparent; border: 0; border-radius: 0; }
 }
 
 .lab-nav-item {
-  height: 36px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 12px;
+  height: auto;
+  min-height: 0;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.2;
   color: #f4efe6;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.lab-nav-item .lab-nav-icon {
+  display: flex;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+.lab-nav-item .lab-nav-icon svg,
+.lab-sidebar .lab-nav-item svg {
+  width: 18px;
+  height: 18px;
 }
 
 .lab-nav-item:hover {
@@ -310,12 +458,16 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   color: #fff;
 }
 
-/* Global search — HubSpot-style Find pill on the green strip */
+/* Global search — HubSpot-style Find pill on the green strip (cream column, not sidebar) */
 .lab-top .lab-global-search,
 .lab-topstrip .lab-global-search {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
   width: 270px;
-  height: 26px;
-  margin: 0;
+  max-width: min(270px, 100%);
+  height: 36px; /* match row; input stays 26px centered */
+  margin: 0; /* immediately after 216px brand slot — cream column, not sidebar */
   flex-shrink: 0;
 }
 .lab-top .lab-global-search-input,
@@ -323,6 +475,7 @@ aside img { background: transparent; border: 0; border-radius: 0; }
   box-sizing: border-box;
   display: block;
   width: 270px;
+  max-width: 100%;
   height: 26px;
   min-height: 26px;
   max-height: 26px;
